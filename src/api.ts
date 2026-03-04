@@ -12,21 +12,28 @@ async function chatViaRequestUrl(
   body: string,
   callbacks: StreamCallbacks
 ): Promise<void> {
-  const response = await requestUrl({
-    url: fullUrl,
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body,
-    throw: true,
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 120000); // 2 min timeout
 
-  const data = response.json;
-  const content = data.choices?.[0]?.message?.content;
-  if (content) callbacks.onToken(content);
-  callbacks.onDone();
+  try {
+    const response = await requestUrl({
+      url: fullUrl,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body,
+      throw: true,
+    });
+
+    const data = response.json;
+    const content = data.choices?.[0]?.message?.content;
+    if (content) callbacks.onToken(content);
+    callbacks.onDone();
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 async function chatViaNodeHttps(
@@ -58,6 +65,9 @@ async function chatViaNodeHttps(
   return new Promise<void>((resolve, reject) => {
     const transport = isHttps ? https : http;
     const req = transport.request(options, (res: any) => {
+      req.setTimeout(120000, () => {
+        req.destroy(new Error("Request timeout (120s)"));
+      });
       if (res.statusCode !== 200) {
         let errBody = "";
         res.on("data", (chunk: any) => (errBody += chunk.toString()));
