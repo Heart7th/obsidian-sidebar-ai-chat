@@ -142,16 +142,24 @@ export class ChatView extends ItemView {
   }
 
   private async onActiveFileChange(): Promise<void> {
+    // Only track markdown editor leaves, ignore sidebar/chat panel clicks
+    const activeLeaf = this.app.workspace.activeLeaf;
+    if (activeLeaf?.getViewState()?.type === VIEW_TYPE_CHAT) {
+      // User clicked on the chat sidebar — keep the previous file context
+      return;
+    }
+
     const activeFile = this.app.workspace.getActiveFile();
     if (!activeFile) {
-      this.activeFileContent = null;
-      this.activeFilePath = null;
-      this.contextIndicator.style.display = "none";
+      // Don't clear context if no file is active (e.g. sidebar focused)
+      if (!this.activeFilePath) {
+        this.contextIndicator.style.display = "none";
+      }
       return;
     }
 
     // Skip chat history files
-    if (activeFile.path.startsWith(this.plugin.settings)) {
+    if (activeFile.path.endsWith("_chat.md")) {
       return;
     }
 
