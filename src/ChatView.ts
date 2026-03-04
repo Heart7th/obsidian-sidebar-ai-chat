@@ -396,8 +396,8 @@ export class ChatView extends ItemView {
       const fileSize = this.activeFileContent ? new Blob([this.activeFileContent]).size : 0;
       const isLargeFile = fileSize > 200000; // >200KB: send path only, let agent read
       // Get absolute path for agent file access
-      const basePath = (this.app.vault.adapter as any).basePath || "";
-      const absolutePath = basePath ? `${basePath}/${this.activeFilePath}` : this.activeFilePath;
+      const agentBase = this.plugin.settings.agentVaultPath || (this.app.vault.adapter as any).basePath || "";
+      const absolutePath = agentBase ? `${agentBase.replace(/\/$/, "")}/${this.activeFilePath}` : this.activeFilePath;
 
       let contextPrompt: string;
       if (isLargeFile) {

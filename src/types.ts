@@ -14,6 +14,7 @@ export interface SidebarAISettings {
   projects: Project[];
   defaultProject: string;
   hideChatFiles: boolean;
+  agentVaultPath: string; // absolute vault path on the agent's machine (for file operations)
 }
 
 export const DEFAULT_SETTINGS: SidebarAISettings = {
@@ -25,6 +26,7 @@ export const DEFAULT_SETTINGS: SidebarAISettings = {
   projects: [{ name: "General", model: "gpt-4o" }],
   defaultProject: "General",
   hideChatFiles: true,
+  agentVaultPath: "",
 };
 
 export interface ChatMessage {

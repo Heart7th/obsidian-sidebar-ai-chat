@@ -93,6 +93,19 @@ export class SidebarAISettingsTab extends PluginSettingTab {
           })
       );
 
+    new Setting(containerEl)
+      .setName("Agent vault path")
+      .setDesc("Absolute path to this vault on the agent's machine. Used for file read/edit operations. Leave empty to use local path.")
+      .addText((text) =>
+        text
+          .setPlaceholder("/Users/Heart7/Obsidian/主要")
+          .setValue(this.plugin.settings.agentVaultPath)
+          .onChange(async (value) => {
+            this.plugin.settings.agentVaultPath = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
     // Projects list
     containerEl.createEl("h3", { text: "Projects" });
     containerEl.createEl("p", {
