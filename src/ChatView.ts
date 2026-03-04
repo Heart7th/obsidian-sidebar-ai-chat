@@ -168,7 +168,8 @@ export class ChatView extends ItemView {
     // Read file content (truncate if too long)
     try {
       const content = await this.app.vault.read(activeFile);
-      this.activeFileContent = content.length > 8000 ? content.slice(0, 8000) + "\n...(truncated)" : content;
+      const maxChars = 100000; // ~50K tokens, safe for most models
+      this.activeFileContent = content.length > maxChars ? content.slice(0, maxChars) + "\n...(truncated)" : content;
     } catch {
       this.activeFileContent = null;
     }
