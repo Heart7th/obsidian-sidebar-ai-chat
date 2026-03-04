@@ -54,7 +54,7 @@ async function chatViaNodeHttps(
     port: parsed.port || (isHttps ? 443 : 80),
     path: parsed.pathname,
     method: "POST",
-    timeout: 120000,
+    timeout: 300000, // 5 min for large file contexts
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
@@ -94,7 +94,7 @@ async function chatViaNodeHttps(
       res.on("error", (err: Error) => { callbacks.onError(err); reject(err); });
     });
     req.on("timeout", () => {
-      req.destroy(new Error("Request timeout — the agent may still be working. Check your notes for updates."));
+      req.destroy(new Error("Request timeout (5min) — the agent may still be working."));
     });
     req.on("error", (err: Error) => { callbacks.onError(err); reject(err); });
     req.write(body);
@@ -123,20 +123,11 @@ export async function streamChat(
     user: `obsidian-${projectName}`,
   });
 
-  // Mobile: always use requestUrl (no Node.js)
-  // Desktop: try requestUrl first, fall back to Node https for self-signed certs
+  // Mobile: use requestUrl (no Node.js available)
+  // Desktop: use Node.js http/https directly for full timeout control
   if (Platform.isMobile) {
     return chatViaRequestUrl(fullUrl, apiKey, body, callbacks);
   }
 
-  try {
-    await chatViaRequestUrl(fullUrl, apiKey, body, callbacks);
-  } catch (e: any) {
-    const msg = String(e?.message || e || "");
-    if (msg.includes("CERT") || msg.includes("certificate") || msg.includes("ERR_CERT")) {
-      await chatViaNodeHttps(fullUrl, apiKey, body, callbacks);
-    } else {
-      throw e;
-    }
-  }
+  return chatViaNodeHttps(fullUrl, apiKey, body, callbacks);
 }
