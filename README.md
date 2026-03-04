@@ -16,11 +16,32 @@ An Obsidian plugin that adds an AI chat sidebar with **automatic file context** 
 - 🦞 **Native OpenClaw Support** — First-class integration with [OpenClaw](https://github.com/openclaw/openclaw) Gateway for multi-agent routing
 - 📱 **Mobile Support** — Works on iPad and mobile devices
 
+## Installation
+
+### From Community Plugins (coming soon)
+1. Open Obsidian Settings → Community plugins → Browse
+2. Search "Sidebar AI Chat"
+3. Click Install → Enable
+
+### Manual Install
+1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/Heart7th/obsidian-sidebar-ai-chat/releases)
+2. Create folder: `<your-vault>/.obsidian/plugins/sidebar-ai-chat/`
+3. Copy the 3 files into the folder
+4. Restart Obsidian → Settings → Community plugins → Enable "Sidebar AI Chat"
+
+### Build from Source
+```bash
+git clone https://github.com/Heart7th/obsidian-sidebar-ai-chat.git
+cd obsidian-sidebar-ai-chat
+npm install
+npm run build
+```
+Copy `main.js`, `manifest.json`, `styles.css` to your vault's plugin folder.
+
 ## Setup
 
-1. Install the plugin
-2. Open Settings → Sidebar AI Chat
-3. Configure:
+1. Open Settings → Sidebar AI Chat
+2. Configure:
    - **API URL**: Your OpenAI-compatible endpoint
    - **API Key**: Your API key
    - **User / Assistant names**: Customize display names

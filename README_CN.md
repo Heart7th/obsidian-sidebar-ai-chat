@@ -14,11 +14,32 @@
 - 🦞 **原生 OpenClaw 支持** — 与 [OpenClaw](https://github.com/openclaw/openclaw) Gateway 深度集成，支持多 Agent 路由
 - 📱 **移动端支持** — iPad 和手机均可使用
 
+## 安装
+
+### 从社区插件安装（即将上线）
+1. 打开 Obsidian 设置 → 第三方插件 → 浏览
+2. 搜索 "Sidebar AI Chat"
+3. 点击安装 → 启用
+
+### 手动安装
+1. 从 [最新 Release](https://github.com/Heart7th/obsidian-sidebar-ai-chat/releases) 下载 `main.js`、`manifest.json`、`styles.css`
+2. 在你的 Vault 中创建文件夹：`<vault>/.obsidian/plugins/sidebar-ai-chat/`
+3. 将 3 个文件复制到该文件夹
+4. 重启 Obsidian → 设置 → 第三方插件 → 启用 "Sidebar AI Chat"
+
+### 从源码构建
+```bash
+git clone https://github.com/Heart7th/obsidian-sidebar-ai-chat.git
+cd obsidian-sidebar-ai-chat
+npm install
+npm run build
+```
+将 `main.js`、`manifest.json`、`styles.css` 复制到 Vault 的插件目录。
+
 ## 快速开始
 
-1. 安装插件
-2. 打开 设置 → Sidebar AI Chat
-3. 配置：
+1. 打开 设置 → Sidebar AI Chat
+2. 配置：
    - **API URL**：你的 API 端点
    - **API Key**：API 密钥
    - **用户名 / 助手名**：自定义显示名称
