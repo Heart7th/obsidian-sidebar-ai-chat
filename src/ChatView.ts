@@ -392,11 +392,18 @@ export class ChatView extends ItemView {
     const apiMessages: { role: string; content: string }[] = [];
 
     // Add system context with current file if available
-    if (this.activeFileContent && this.activeFilePath) {
-      apiMessages.push({
-        role: "system",
-        content: `You are responding via an Obsidian sidebar chat plugin. The user wants you to help write and edit their notes.\n\nThe user is currently viewing/editing this file in Obsidian:\n\nFile: ${this.activeFilePath}\n\nFile content:\n\`\`\`\n${this.activeFileContent}\n\`\`\`\n\nRULES:\n1. Unless the user explicitly specifies a different file, ALL writing/editing tasks target THIS file (${this.activeFilePath}).\n2. BEFORE editing any file, you MUST first show the user what you plan to write/change and ask for confirmation. For example: "I'll add the following paragraph after section X: [content]. Shall I go ahead?"\n3. Only after the user confirms (e.g. "yes", "go ahead", "ok", "好", "可以", "改吧") should you use Edit/Write tools to apply the changes.\n4. For simple questions, discussions, or summaries: just reply with text, no confirmation needed.\n5. Never edit files without explicit user approval.`,
-      });
+    if (this.activeFilePath) {
+      const fileSize = this.activeFileContent ? new Blob([this.activeFileContent]).size : 0;
+      const isLargeFile = fileSize > 200000; // >200KB: send path only, let agent read
+
+      let contextPrompt: string;
+      if (isLargeFile) {
+        contextPrompt = `You are responding via an Obsidian sidebar chat plugin. The user wants you to help write and edit their notes.\n\nThe user is currently viewing/editing this file in Obsidian:\n\nFile: ${this.activeFilePath} (${Math.round(fileSize/1024)}KB — large file, content not included)\n\nThis file is too large to include inline. Use your Read tool to read the file content (you can read specific sections with offset/limit). The file is at the path shown above.\n\nRULES:\n1. Unless the user explicitly specifies a different file, ALL writing/editing tasks target THIS file (${this.activeFilePath}).\n2. BEFORE editing any file, you MUST first show the user what you plan to write/change and ask for confirmation.\n3. Only after the user confirms should you use Edit/Write tools to apply changes.\n4. For simple questions or discussions: just reply with text, no confirmation needed.\n5. Never edit files without explicit user approval.`;
+      } else {
+        contextPrompt = `You are responding via an Obsidian sidebar chat plugin. The user wants you to help write and edit their notes.\n\nThe user is currently viewing/editing this file in Obsidian:\n\nFile: ${this.activeFilePath}\n\nFile content:\n\`\`\`\n${this.activeFileContent}\n\`\`\`\n\nRULES:\n1. Unless the user explicitly specifies a different file, ALL writing/editing tasks target THIS file (${this.activeFilePath}).\n2. BEFORE editing any file, you MUST first show the user what you plan to write/change and ask for confirmation.\n3. Only after the user confirms should you use Edit/Write tools to apply changes.\n4. For simple questions or discussions: just reply with text, no confirmation needed.\n5. Never edit files without explicit user approval.`;
+      }
+
+      apiMessages.push({ role: "system", content: contextPrompt });
     }
 
     // Add recent chat history
