@@ -1,3 +1,5 @@
+[中文文档](README_CN.md)
+
 # Sidebar AI Chat
 
 An Obsidian plugin that adds an AI chat sidebar with **automatic file context** and **project-based conversation management**. Native **OpenClaw** Gateway support + any OpenAI-compatible API.
