@@ -370,7 +370,7 @@ export class ChatView extends ItemView {
     if (this.activeFileContent && this.activeFilePath) {
       apiMessages.push({
         role: "system",
-        content: `The user is currently editing this file in Obsidian:\n\nFile: ${this.activeFilePath}\n\n\`\`\`\n${this.activeFileContent}\n\`\`\`\n\nUse this context to assist them. If they ask about "this file" or "this note", refer to this content.`,
+        content: `The user is currently viewing/editing this file in Obsidian:\n\nFile: ${this.activeFilePath}\n\n\`\`\`\n${this.activeFileContent}\n\`\`\`\n\nIMPORTANT: Unless the user explicitly specifies a different file or asks to create a new note, ALL writing, editing, and content generation tasks should target THIS file. If they say "write something here" or "add a paragraph", it means in this file. Do not edit or create other files unless explicitly asked.`,
       });
     }
 
