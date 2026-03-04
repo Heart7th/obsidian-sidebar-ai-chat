@@ -1,4 +1,4 @@
-[中文文档](README_CN.md)
+[中文文档](README_CN.md) | [日本語ドキュメント](README_JA.md)
 
 # Sidebar AI Chat
 
