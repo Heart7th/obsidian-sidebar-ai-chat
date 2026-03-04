@@ -54,6 +54,7 @@ async function chatViaNodeHttps(
     port: parsed.port || (isHttps ? 443 : 80),
     path: parsed.pathname,
     method: "POST",
+    timeout: 120000,
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
@@ -65,9 +66,6 @@ async function chatViaNodeHttps(
   return new Promise<void>((resolve, reject) => {
     const transport = isHttps ? https : http;
     const req = transport.request(options, (res: any) => {
-      req.setTimeout(120000, () => {
-        req.destroy(new Error("Request timeout (120s)"));
-      });
       if (res.statusCode !== 200) {
         let errBody = "";
         res.on("data", (chunk: any) => (errBody += chunk.toString()));
@@ -94,6 +92,9 @@ async function chatViaNodeHttps(
         }
       });
       res.on("error", (err: Error) => { callbacks.onError(err); reject(err); });
+    });
+    req.on("timeout", () => {
+      req.destroy(new Error("Request timeout — the agent may still be working. Check your notes for updates."));
     });
     req.on("error", (err: Error) => { callbacks.onError(err); reject(err); });
     req.write(body);

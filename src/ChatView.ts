@@ -371,6 +371,15 @@ export class ChatView extends ItemView {
     const { body } = this.createStreamingBubble();
     let fullResponse = "";
 
+    // Show elapsed time while waiting
+    const startTime = Date.now();
+    const timerInterval = setInterval(() => {
+      if (!fullResponse) {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        body.setText(`Thinking... ${elapsed}s`);
+      }
+    }, 1000);
+
     // Build messages for API
     const apiMessages: { role: string; content: string }[] = [];
 
@@ -378,7 +387,7 @@ export class ChatView extends ItemView {
     if (this.activeFileContent && this.activeFilePath) {
       apiMessages.push({
         role: "system",
-        content: `The user is currently viewing/editing this file in Obsidian:\n\nFile: ${this.activeFilePath}\n\n\`\`\`\n${this.activeFileContent}\n\`\`\`\n\nIMPORTANT: Unless the user explicitly specifies a different file or asks to create a new note, ALL writing, editing, and content generation tasks should target THIS file. If they say "write something here" or "add a paragraph", it means in this file. Do not edit or create other files unless explicitly asked.`,
+        content: `You are responding via an Obsidian sidebar chat plugin (HTTP API). Keep responses concise and fast.\n\nThe user is currently viewing/editing this file in Obsidian:\n\nFile: ${this.activeFilePath}\n\n\`\`\`\n${this.activeFileContent}\n\`\`\`\n\nIMPORTANT RULES:\n1. Unless the user explicitly specifies a different file or asks to create a new note, ALL writing/editing tasks target THIS file.\n2. Respond with TEXT ONLY. Write your suggested content or edits directly in your reply. Do NOT use tools to edit files — the user will copy what they need from your response.\n3. If the user asks you to "write here" or "add a paragraph", compose the text in your reply. Do not attempt file operations.\n4. Keep responses fast — this is a synchronous HTTP request with timeout constraints.`,
       });
     }
 
@@ -436,6 +445,7 @@ export class ChatView extends ItemView {
         body.addClass("openclaw-error");
       }
     } finally {
+      clearInterval(timerInterval);
       this.isStreaming = false;
       this.sendBtn.disabled = false;
       this.inputEl.focus();
