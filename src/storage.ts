@@ -27,9 +27,13 @@ async function ensureFolder(vault: Vault, path: string): Promise<void> {
   for (const part of parts) {
     current = current ? `${current}/${part}` : part;
     const normalized = normalizePath(current);
-    const existing = vault.getAbstractFileByPath(normalized);
-    if (!existing) {
-      await vault.createFolder(normalized);
+    try {
+      const existing = vault.getAbstractFileByPath(normalized);
+      if (!existing) {
+        await vault.createFolder(normalized);
+      }
+    } catch {
+      // folder may already exist due to race condition
     }
   }
 }
@@ -42,23 +46,27 @@ export async function appendMessage(
   role: "user" | "assistant",
   content: string
 ): Promise<void> {
-  const filePath = getChatFilePath(settings.chatRoot, projectName, vaultName);
-  const folderPath = filePath.includes("/") ? filePath.substring(0, filePath.lastIndexOf("/")) : null;
-  if (folderPath) {
-    await ensureFolder(vault, folderPath);
-  }
+  try {
+    const filePath = getChatFilePath(settings.chatRoot, projectName, vaultName);
+    const folderPath = filePath.includes("/") ? filePath.substring(0, filePath.lastIndexOf("/")) : null;
+    if (folderPath) {
+      await ensureFolder(vault, folderPath);
+    }
 
-  const date = getDateStr();
-  const time = getTimeStr();
-  const sender = role === "user" ? settings.userName : settings.assistantName;
-  const line = `\n### ${date} ${time}\n**${sender}**: ${content}\n`;
+    const date = getDateStr();
+    const time = getTimeStr();
+    const sender = role === "user" ? settings.userName : settings.assistantName;
+    const line = `\n### ${date} ${time}\n**${sender}**: ${content}\n`;
 
-  let file = vault.getAbstractFileByPath(filePath);
-  if (!file) {
-    const header = `# Chat\n`;
-    await vault.create(filePath, header + line);
-  } else if (file instanceof TFile) {
-    await vault.append(file, line);
+    let file = vault.getAbstractFileByPath(filePath);
+    if (!file) {
+      const header = `# Chat\n`;
+      await vault.create(filePath, header + line);
+    } else if (file instanceof TFile) {
+      await vault.append(file, line);
+    }
+  } catch (e) {
+    console.error("Sidebar AI Chat: failed to save message", e);
   }
 }
 
