@@ -420,7 +420,7 @@ export class ChatView extends ItemView {
       await streamChat(
         this.plugin.settings.apiUrl,
         this.plugin.settings.apiKey,
-        this.currentProject.model,
+        this.currentProject.model || this.plugin.settings.defaultModel || "",
         apiMessages,
         this.currentProject.name,
         {

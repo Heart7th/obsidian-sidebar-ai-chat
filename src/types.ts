@@ -15,6 +15,7 @@ export interface SidebarAISettings {
   defaultProject: string;
   hideChatFiles: boolean;
   agentVaultPath: string; // absolute vault path on the agent's machine (for file operations)
+  defaultModel: string;   // global default model/agent (e.g. "openclaw:writer")
 }
 
 export const DEFAULT_SETTINGS: SidebarAISettings = {
@@ -27,6 +28,7 @@ export const DEFAULT_SETTINGS: SidebarAISettings = {
   defaultProject: "General",
   hideChatFiles: true,
   agentVaultPath: "",
+  defaultModel: "",
 };
 
 export interface ChatMessage {

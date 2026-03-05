@@ -94,6 +94,19 @@ export class SidebarAISettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
+      .setName("Default model")
+      .setDesc("Global default model or agent. Used when a project has no model set. (e.g. openclaw:writer, gpt-4o)")
+      .addText((text) =>
+        text
+          .setPlaceholder("openclaw:writer")
+          .setValue(this.plugin.settings.defaultModel)
+          .onChange(async (value) => {
+            this.plugin.settings.defaultModel = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
       .setName("Agent vault path")
       .setDesc("Absolute path to this vault on the agent's machine. Used for file read/edit operations. Leave empty to use local path.")
       .addText((text) =>
