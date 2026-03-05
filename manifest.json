@@ -1,7 +1,7 @@
 {
   "id": "sidebar-ai-chat",
   "name": "Sidebar AI Chat",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "minAppVersion": "1.0.0",
   "description": "AI chat sidebar with auto file context, project-based conversations, and markdown chat history. Works with any OpenAI-compatible API.",
   "author": "Vincent Tu",
