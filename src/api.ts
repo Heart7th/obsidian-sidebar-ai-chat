@@ -97,6 +97,13 @@ async function chatViaNodeStreaming(
   return new Promise<void>((resolve, reject) => {
     const transport = isHttps ? https : http;
     const req = transport.request(options, (res: any) => {
+      // Enable TCP keepalive on the socket to prevent idle disconnection
+      if (res.socket) {
+        res.socket.setKeepAlive(true, 30000); // send keepalive every 30s
+        res.socket.setTimeout(600000); // 10 min socket timeout
+        res.socket.on("timeout", () => {}); // prevent auto-destroy on timeout
+      }
+
       if (res.statusCode !== 200) {
         let errBody = "";
         res.on("data", (chunk: any) => (errBody += chunk.toString()));
